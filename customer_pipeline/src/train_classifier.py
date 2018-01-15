@@ -88,7 +88,7 @@ class TrainClassifier:
                     else:
                         self.person_embs.update({name: emb_array[0]})
 
-                    np.save(os.path.join(self.output, 'embeddings.npy'))
+                    np.save(os.path.join(self.output, 'embeddings.npy'), self.person_embs)
 
                     print('Saved classifier model to file "%s"' % classifier_filename_exp)
                     self.pub.publish(classifier_filename_exp)
