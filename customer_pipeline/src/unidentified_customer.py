@@ -25,7 +25,7 @@ class TrainClassifier:
         self.min_size = args.min_cluster_size
         self.gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=args.gpu_memory_fraction)
 
-        self.train_pub = rospy.Publisher("train_command", String, queue_size=1)
+        self.train_pub = rospy.Publisher('train_command', String, queue_size=1)
 
         with tf.Graph().as_default():
             with tf.Session(
@@ -40,6 +40,8 @@ class TrainClassifier:
                 self.bridge = CvBridge()
 
                 self.image_sub = rospy.Subscriber(self.topic, Image, self.ros_callback)
+
+                rospy.spin()
 
     def _load_images_from_folder(self, folder):
         images = []
@@ -72,21 +74,21 @@ class TrainClassifier:
                 os.remove(image_paths[image_index])
             count += 1
 
-        print("Safed as: " + rand)
-        print("Ask customer for name please!")
+        print('Safed as: ' + rand)
+        print('Ask customer for name please!')
 
     def ros_callback(self, data):
         safe = True
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+            cv_image = self.bridge.imgmsg_to_cv2(data, 'bgr8')
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
         except CvBridgeError as e:
-            print(e)
+            return
 
         image_list, paths = self._load_images_from_folder(self.folder_unknown)
         if len(image_list) > 0:
             image_list.insert(0, cv_image)
-            paths.insert(0, "cv_image")
+            paths.insert(0, 'cv_image')
             img_list_prepared = self._prepare_images(image_list)
             feed_dict = {self.images_placeholder: img_list_prepared,
                          self.phase_train_placeholder: False}
@@ -141,6 +143,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     trainer = TrainClassifier(args)
-
-    while True:
-        time.sleep(5)

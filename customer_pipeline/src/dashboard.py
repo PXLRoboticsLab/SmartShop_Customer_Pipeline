@@ -8,6 +8,7 @@ import facenet
 import tkMessageBox
 import time
 import shutil
+import threading
 import change_name_dialog
 import rospy
 import numpy as np
@@ -168,7 +169,7 @@ def scan_face(name):
             tkMessageBox.showinfo("Starting scan.", "Starting face scan. This will take approximately 20 seconds."
                                                     "\nDuring the scan rotate your head slightly to the left and right."
                                                     "\nPress OK to continue.")
-            # threading.Thread(target=scan_face_thread, args=()).start()
+            threading.Thread(target=scan_face_thread, args=()).start()
         else:
             tkMessageBox.showerror("Error!", "There is no face in the current frame."
                                              "\nPress OK and try again.")
