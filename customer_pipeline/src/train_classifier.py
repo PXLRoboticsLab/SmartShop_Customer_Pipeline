@@ -32,7 +32,7 @@ class TrainClassifier:
         self.gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=args.gpu_memory_fraction)
 
         try:
-            self.person_embs = np.load(os.path.join(self.output, 'embeddings.npy'))
+            self.person_embs = np.load(os.path.join(self.output, 'embeddings.npy')).item()
         except IOError:
             self.person_embs = {}
 

@@ -6,6 +6,7 @@ import tensorflow as tf
 import align.detect_face
 import facenet
 import tkMessageBox
+import argparse
 import time
 import shutil
 import threading
@@ -152,7 +153,7 @@ def scan_face_thread():
             misc.imsave(os.path.join(path, name.strip() + '_' + str('%0*d' % (4, nrof_images)) + '.png'),
                         scan_list[0])
             nrof_images += 1
-        time.sleep(1)
+        time.sleep(0.5)
     tkMessageBox.showinfo("Scan done", "Scanning of customer face is done!")
     pub.publish("Train")
 
@@ -166,7 +167,7 @@ def scan_face(name):
             list_box.select_set(END)
             os.mkdir(os.path.join(folder, name.replace(" ", "_")))
             name_entry.delete(0, "end")
-            tkMessageBox.showinfo("Starting scan.", "Starting face scan. This will take approximately 20 seconds."
+            tkMessageBox.showinfo("Starting scan.", "Starting face scan. This will take approximately 10 seconds."
                                                     "\nDuring the scan rotate your head slightly to the left and right."
                                                     "\nPress OK to continue.")
             threading.Thread(target=scan_face_thread, args=()).start()
@@ -188,7 +189,15 @@ if __name__ == "__main__":
     rospy.init_node("customer_dashboard")
     pub = rospy.Publisher("train_command", String, queue_size=1)
 
-    folder = "/home/maarten/Documents/ProjectIris/Classifier"
+    parser = argparse.ArgumentParser()
+    parser.add_argument('data_dir', type=str,
+                        help='Path to the data directory containing classifier data.')
+    parser.add_argument('--gpu_memory_fraction', type=float,
+                        help='Upper bound on the amount of GPU memory that will be used by the process.', default=0.20)
+
+    args = parser.parse_args()
+
+    folder = args.data_dir
     print("Loading face detection model")
     pnet, rnet, onet = create_network_face_detection()
 
@@ -199,7 +208,7 @@ if __name__ == "__main__":
 
     root = tk.Tk()
     root.title("Customer dashboard")
-    root.wm_iconbitmap("@/home/maarten/Pictures/icon2.xbm")
+    #root.wm_iconbitmap("@/home/maarten/Pictures/icon2.xbm")
     root.resizable(width=False, height=False)
     root.geometry("{}x{}".format(1000, 500))
     root.bind("<Escape>", lambda e: root.quit())
