@@ -19,9 +19,12 @@ from PIL import Image, ImageTk
 from std_msgs.msg import String
 
 scan_list = []
+scanning = False
+nrof_images = 1
 
 
 def mark_faces(frame):
+    height, width, _ = frame.shape
     faces, boxes = align_data([frame], 160, 44, pnet, rnet, onet)
     if boxes is not None:
         for box in boxes:
@@ -30,6 +33,12 @@ def mark_faces(frame):
                 frame = cv2.putText(frame, "{:.2%}".format(box[4]), (int(box[0]), int(box[1] - 10)),
                                     cv2.FONT_HERSHEY_SIMPLEX,
                                     0.5, (0, 255, 0), 1, cv2.LINE_AA)
+                if scanning:
+                    frame = cv2.rectangle(frame, (int((width / 2) - 201), 9), (int((width / 2) + 201), 31),
+                                          (0, 51, 153), 2)
+                    frame = cv2.rectangle(frame, (int((width / 2) - 200), 10),
+                                          (int((width / 2) + ((20 * nrof_images) - 200)), 30), (102, 153, 255),
+                                          cv2.FILLED)
     return frame, faces
 
 
@@ -142,35 +151,38 @@ def remove_customer():
         tkMessageBox.showerror("Error!", "No client selected.")
 
 
-def scan_face_thread():
+def scan_face_thread(name):
     global train
+    global nrof_images
+    global scanning
+    scanning = True
+
     nrof_images = 1
-    name = list_box.get(list_box.curselection()[0]).replace(" ", "_")
     path = os.path.join(folder, name)
 
     while nrof_images < 21:
         if scan_list is not None:
-            misc.imsave(os.path.join(path, name.strip() + '_' + str('%0*d' % (4, nrof_images)) + '.png'),
-                        scan_list[0])
+            misc.imsave(os.path.join(path, name + '_' + str('%0*d' % (4, nrof_images)) + '.png'), scan_list[0])
             nrof_images += 1
         time.sleep(0.5)
+    scanning = False
     tkMessageBox.showinfo("Scan done", "Scanning of customer face is done!")
     pub.publish("Train")
 
 
 def scan_face(name):
+    global scanning
     scanning = False
     while not scanning:
         if scan_list is not None:
-            scanning = True
             list_box.insert(END, name)
             list_box.select_set(END)
-            os.mkdir(os.path.join(folder, name.replace(" ", "_")))
             name_entry.delete(0, "end")
             tkMessageBox.showinfo("Starting scan.", "Starting face scan. This will take approximately 10 seconds."
                                                     "\nDuring the scan rotate your head slightly to the left and right."
                                                     "\nPress OK to continue.")
-            threading.Thread(target=scan_face_thread, args=()).start()
+            os.mkdir(os.path.join(folder, name.replace(" ", "_")))
+            threading.Thread(target=scan_face_thread, args=(name.replace(' ', '_'), )).start()
         else:
             tkMessageBox.showerror("Error!", "There is no face in the current frame."
                                              "\nPress OK and try again.")
