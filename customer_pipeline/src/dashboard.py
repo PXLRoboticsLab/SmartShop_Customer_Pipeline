@@ -34,7 +34,7 @@ def mark_faces(frame):
                                     cv2.FONT_HERSHEY_SIMPLEX,
                                     0.5, (0, 255, 0), 1, cv2.LINE_AA)
                 if scanning:
-                    frame = cv2.rectangle(frame, (int((width / 2) - 201), 9), (int((width / 2) + 201), 31),
+                    frame = cv2.rectangle(frame, (int((width / 2) - 202), 8), (int((width / 2) + 202), 32),
                                           (0, 51, 153), 2)
                     frame = cv2.rectangle(frame, (int((width / 2) - 200), 10),
                                           (int((width / 2) + ((20 * nrof_images) - 200)), 30), (102, 153, 255),
