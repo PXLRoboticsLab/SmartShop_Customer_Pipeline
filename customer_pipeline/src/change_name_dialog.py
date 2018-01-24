@@ -17,7 +17,7 @@ class MyDialog:
         y = (hs / 2) - (h / 2)
         top.geometry('+%d+%d' % (x, y))
         top.title('Change client name')
-        top.wm_iconbitmap("@/home/maarten/Pictures/icon2.xbm")
+        #top.wm_iconbitmap("@/home/maarten/Pictures/icon2.xbm")
         top.grid_rowconfigure(2, weight=1)
         top.grid_columnconfigure(2, weight=1)
         self.myLabel = tk.Label(top, text='New name: ')
@@ -38,18 +38,18 @@ class MyDialog:
         if new_name != "":
             result = tkMessageBox.askquestion('Change name?',
                                               'Are you sure you want to change the name of "'
-                                              + self.person + '" into "' + new_name + '"?',
+                                              + self.person + '" to "' + new_name + '"?',
                                               icon='warning')
             if result == "yes":
                 new_name = new_name.replace(' ', '_')
                 count = 1
-                path = os.path.join(self.folder, self.person)
+                path = os.path.join(self.folder, self.person.replace(' ', '_'))
                 for img in os.listdir(path):
                     if img.endswith('.png'):
-                        img_new_name = new_name + '_' + str('%0*d' % (4, count)) + '.png'
+                        img_new_name = new_name.replace(' ', '_') + '_' + str('%0*d' % (4, count)) + '.png'
                         os.rename(os.path.join(path, img), os.path.join(path, img_new_name))
                         count += 1
-                os.rename(os.path.join(self.folder, self.person), os.path.join(self.folder, new_name))
+                os.rename(path, os.path.join(self.folder, new_name.replace(' ', '_')))
             self.top.destroy()
         else:
             tkMessageBox.showerror('Error!', 'Please enter a name.')
