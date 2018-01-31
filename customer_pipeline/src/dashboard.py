@@ -37,7 +37,7 @@ def mark_faces(frame):
                     frame = cv2.rectangle(frame, (int((width / 2) - 202), 8), (int((width / 2) + 202), 32),
                                           (0, 51, 153), 2)
                     frame = cv2.rectangle(frame, (int((width / 2) - 200), 10),
-                                          (int((width / 2) + ((20 * nrof_images) - 200)), 30), (102, 153, 255),
+                                          (int((width / 2) + ((20 * (nrof_images-1)) - 200)), 30), (102, 153, 255),
                                           cv2.FILLED)
     return frame, faces
 
@@ -160,7 +160,7 @@ def scan_face_thread(name):
     nrof_images = 1
     path = os.path.join(folder, name)
 
-    while nrof_images < 21:
+    while nrof_images <= 20:
         if scan_list is not None:
             misc.imsave(os.path.join(path, name + '_' + str('%0*d' % (4, nrof_images)) + '.png'), scan_list[0])
             nrof_images += 1
